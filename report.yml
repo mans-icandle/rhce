@@ -1,0 +1,43 @@
+- name: edit file
+  hosts: all
+  tasks:
+   - name: copy file
+     copy: 
+       src: report.txt
+       dest: /root/report.txt
+   - name: change host
+     lineinfile:
+       regex: ^HOST
+       line: HOST={{ansible_hostname}}
+       state: present
+       path: /root/report.txt
+   - name: change mem
+     lineinfile:
+       regex: ^MEMORY
+       line: MEMORY={{ansible_memtotal_mb}}
+       state: present
+       path: /root/report.txt
+
+   - name: change bios
+     lineinfile:
+       line: BIOS={{ansible_bios_version}}
+       regex: ^BIOS
+       state: present
+       path: /root/report.txt
+
+   - name: change sda
+     lineinfile:
+       line: SDA_DISK_SIZE ={%if ansible_devices.sda is defined%}{{ansible_devices.sda.size}}{%else%}NONE{%endif%}
+       regex: ^SDA_DISK_SIZE
+       state: present
+       path: /root/report.txt
+   - name: change sdb
+     lineinfile:
+       line: SDB_DISK_SIZE ={%if ansible_devices.sdb is defined%}{{ansible_devices.sdb.size}}{%else%}NONE{%endif%}
+       regex: ^SDB_DISK_SIZE
+       state: present
+       path: /root/report.txt
+
+
+
+

@@ -1,0 +1,11 @@
+---
+- name: Creates a cron job of date
+  hosts: all
+  tasks: 
+    - name: creates a cron file under /etc/cron.d
+      cron:
+        name: datejob
+        hour: "15"
+        minute: "21"
+        user: root
+        job: "date>>/root/datefile"

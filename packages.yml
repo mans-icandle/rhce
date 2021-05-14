@@ -1,0 +1,25 @@
+---
+- name: install pack
+  hosts: dev,test,webservers
+  become: true
+  tasks:
+    - name: install on all hosts in this play
+      yum:
+        name:
+          - httpd
+          - mod_ssl
+          - mariadb
+        state: latest
+
+    - name: install on dev only
+      yum:
+        name:
+          - '@Development tools'
+        state: latest
+      when: ('dev' in group_names)
+
+    - name: update all packages on development node
+      yum:
+        name: '*'
+        state: latest
+      when: ('dev' in group_names)

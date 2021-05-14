@@ -1,0 +1,58 @@
+---
+- name: webdev
+  hosts: dev
+  tasks:
+    - name: create webdev user
+      user:
+        name: webdev
+        state: present
+
+    - name: create a directory
+      file:
+        mode: '2775'
+        path: /webdev
+        state: directory
+
+    - name: create a symbolic link
+      file:
+        src: /webdev
+        path: /var/www/html/webdev
+        state: link
+
+    - name: create index.html
+      copy:
+        content: Development
+        dest: /webdev/index.html
+
+    - name: install selinux policies
+      yum:
+        name: python3-policycoreutils
+        state: present
+
+    - name: allow httpd from this directory
+      sefcontext:
+        target: '/webdev(/.*)?'
+        setype: httpd_sys_content_t
+        state: present
+
+    - name: restore context
+      shell: restorecon -vR /webdev
+
+    - name: enable httpd
+      service:
+        name: httpd
+        state: started 
+        enabled: true
+
+    - name: enable firewall
+      service:
+        name: firewalld
+        state: started
+        enabled: true
+
+    - name: firewall http service
+      firewalld:
+        service: http
+        state: enabled
+        permanent: yes
+        immediate: yes 
